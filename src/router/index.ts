@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '@/views/Dashboard.vue'
+import Data from '@/views/Data.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,32 +11,27 @@ const router = createRouter({
     {
       path: '/data',
       name: 'data',
-      component: Dashboard,
+      component: Data,
     },
     {
-      path: '/target',
-      name: 'target',
-      component: () => import('@/views/Target.vue'),
+      path: '/process',
+      name: 'process',
+      component: () => import('@/views/Process.vue'),
     },
     {
-      path: '/impact',
-      name: 'impact',
-      component: () => import('@/views/Impact.vue'),
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/views/Dashboard.vue'),
     },
     {
-      path: '/report',
-      name: 'report',
-      component: () => import('@/views/Report.vue'),
+      path: '/conformance',
+      name: 'conformance',
+      component: () => import('@/views/Conformance.vue'),
     },
     {
-      path: '/agent',
-      name: 'agent',
-      component: () => import('@/views/Agent.vue'),
-    },
-    {
-      path: '/studies',
-      name: 'studies',
-      component: () => import('@/views/Studies.vue'),
+      path: '/explore',
+      name: 'explore',
+      component: () => import('@/views/Explore.vue'),
     },
     {
       path: '/settings',

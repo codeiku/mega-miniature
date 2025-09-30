@@ -30,30 +30,6 @@
           </router-link>
         </div>
 
-        <!-- Divider -->
-        <div class="border-t border-gray-200 my-4"></div>
-
-        <!-- Secondary Navigation -->
-        <div class="space-y-1">
-          <router-link
-            v-for="item in secondaryNavItems"
-            :key="item.name"
-            :to="item.href"
-            :class="cn(
-              'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-              {
-                'bg-blue-50 text-blue-700': $route.path === item.href,
-                'text-gray-700 hover:bg-gray-100 hover:text-gray-900': $route.path !== item.href,
-              }
-            )"
-          >
-            <component :is="item.icon" class="h-5 w-5" />
-            {{ item.name }}
-            <span v-if="item.badge" class="ml-auto rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600">
-              {{ item.badge }}
-            </span>
-          </router-link>
-        </div>
       </nav>
 
       <!-- Bottom Navigation -->
@@ -107,14 +83,12 @@ import { useRoute } from 'vue-router'
 import {
   Database,
   BarChart3,
-  Target,
-  TrendingUp,
-  FileText,
-  Bot,
-  FlaskConical,
   Settings,
   Shield,
   HelpCircle,
+  Cog,
+  Activity,
+  Search,
 } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
@@ -123,14 +97,14 @@ const isOpen = ref(false)
 
 const primaryNavItems = [
   { name: 'Data', href: '/data', icon: Database },
-  { name: 'Target', href: '/target', icon: Target },
-  { name: 'Impact', href: '/impact', icon: TrendingUp },
-  { name: 'Report', href: '/report', icon: FileText },
+  { name: 'Process', href: '/process', icon: Cog },
+  { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+  { name: 'Conformance', href: '/conformance', icon: Activity },
+  { name: 'Explore', href: '/explore', icon: Search },
 ]
 
 const secondaryNavItems = [
-  { name: 'Agent', href: '/agent', icon: Bot, badge: 'WIP' },
-  { name: 'Studies', href: '/studies', icon: FlaskConical, badge: 'WIP' },
+  // Removed secondary nav items
 ]
 
 const bottomNavItems = [
