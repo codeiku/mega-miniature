@@ -194,3 +194,76 @@ Implement the following enhancements:
 - Use vue-flow with Background, Controls, and MiniMap components
 - Custom node templates for start/end nodes and process activities
 - Consistent styling with the existing design system
+
+## Prompt 5 - Enhanced Process Mining & Direction Control
+
+Enhance the process mining visualization with advanced process mining features and direction control:
+
+**Process Graph Enhancements:**
+- Add horizontal/vertical direction toggle for process flow layout
+- Enhance process nodes with process mining specific design:
+  * Frequency counters with colored badges
+  * Average duration indicators
+  * Throughput/completion rate metrics
+  * Performance indicators (Excellent/Good/Average/Poor)
+  * Bottleneck detection with visual alerts
+  * Activity icons and enhanced styling
+- Improve node design with:
+  * Gradient backgrounds and enhanced shadows
+  * Process mining terminology (Frequency, Duration, Throughput)
+  * Performance bars with color coding
+  * Hover effects and scaling animations
+  * Bottleneck indicators with pulsing red alerts
+
+**Direction Control:**
+- Horizontal layout: Traditional left-to-right process flow
+- Vertical layout: Top-to-bottom process flow
+- Dynamic position calculation based on selected direction
+- Reactive updates when direction changes
+
+**Process Mining Focus:**
+- Use proper process mining terminology throughout
+- Display case frequencies prominently
+- Show bottlenecks and performance issues visually
+- Include process variants in sidebar with percentages
+- Enhanced flow legend with color coding for case volumes
+- Real-time performance monitoring indicators
+
+**Technical Implementation:**
+- Computed properties for dynamic positioning based on direction
+- Helper functions for performance classification and color coding
+- Bottleneck detection logic (activities with <80% completion rate)
+- Enhanced node templates with process mining metrics
+- Responsive design maintaining process mining best practices
+
+## Prompt 6 - Project MultiSelect Enhancement
+
+Update the Project dropdown in the Data view to support multiple project selection:
+
+**Requirements:**
+- Change single Project dropdown to MultiSelect component
+- Allow users to select multiple projects simultaneously
+- Update dataset filtering to combine datasets from all selected projects
+- Maintain existing MultiSelect component design consistency
+- Update validation logic for multiple project selection
+
+**Technical Changes:**
+- Convert `selectedProject` (string) to `selectedProjects` (string[])
+- Update `projectOptions` to use `MultiSelectOption[]` type
+- Enhance `availableDatasets` computed property to merge datasets from all selected projects
+- Update helper text and labels to reflect multiple selection
+- Maintain reactive clearing of datasets when project selection changes
+
+## Prompt 7 - Remove Process Chart Animation
+
+Remove the flowing animation effect from connecting lines in the process mining chart:
+
+**Objective:**
+- Eliminate the animated flow effect on process chart edges while preserving all other visual elements
+- Maintain line styling (colors, thickness, etc.) and process chart functionality
+
+**Implementation:**
+- Locate all edge definitions in Process.vue vue-flow implementation
+- Change all `animated: true` properties to `animated: false`
+- Preserve line colors, thickness variations, and other visual indicators
+- Ensure process nodes, metrics, and interactivity remain unchanged

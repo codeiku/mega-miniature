@@ -26,26 +26,26 @@
 
 <script setup lang="ts">
 export interface RadioOption {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 export interface RadioGroupProps {
-  options: RadioOption[]
-  modelValue?: string
-  name: string
+  options: RadioOption[];
+  modelValue?: string;
+  name: string;
 }
 
 const props = withDefaults(defineProps<RadioGroupProps>(), {
-  modelValue: '',
-})
+  modelValue: "",
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
-}>()
+  "update:modelValue": [value: string];
+}>();
 
 const handleChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  emit('update:modelValue', target.value)
-}
+  const target = event.target as HTMLInputElement;
+  emit("update:modelValue", target.value);
+};
 </script>

@@ -2,16 +2,24 @@
   <div class="relative">
     <button
       @click="toggleOpen"
-      :class="cn(
-        'flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-        props.class
-      )"
+      :class="
+        cn(
+          'flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          props.class,
+        )
+      "
       :disabled="disabled"
     >
       <span :class="{ 'text-gray-500': !selectedOption }">
         {{ selectedOption?.label || placeholder }}
       </span>
-      <ChevronDown :class="cn('h-4 w-4 opacity-50 transition-transform', { 'rotate-180': isOpen })" />
+      <ChevronDown
+        :class="
+          cn('h-4 w-4 opacity-50 transition-transform', {
+            'rotate-180': isOpen,
+          })
+        "
+      />
     </button>
 
     <div
@@ -31,61 +39,61 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { ChevronDown } from 'lucide-vue-next'
-import { cn } from '@/lib/utils'
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ChevronDown } from "lucide-vue-next";
+import { cn } from "@/lib/utils";
 
 export interface SelectOption {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 export interface SelectProps {
-  options: SelectOption[]
-  modelValue?: string
-  placeholder?: string
-  disabled?: boolean
-  class?: string
+  options: SelectOption[];
+  modelValue?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  class?: string;
 }
 
 const props = withDefaults(defineProps<SelectProps>(), {
-  placeholder: 'Select an option...',
+  placeholder: "Select an option...",
   disabled: false,
-})
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
-}>()
+  "update:modelValue": [value: string];
+}>();
 
-const isOpen = ref(false)
+const isOpen = ref(false);
 
 const selectedOption = computed(() =>
-  props.options.find(option => option.value === props.modelValue)
-)
+  props.options.find((option) => option.value === props.modelValue),
+);
 
 const toggleOpen = () => {
   if (!props.disabled) {
-    isOpen.value = !isOpen.value
+    isOpen.value = !isOpen.value;
   }
-}
+};
 
 const selectOption = (option: SelectOption) => {
-  emit('update:modelValue', option.value)
-  isOpen.value = false
-}
+  emit("update:modelValue", option.value);
+  isOpen.value = false;
+};
 
 const closeOnClickOutside = (event: MouseEvent) => {
-  const target = event.target as Element
-  if (!target.closest('.relative')) {
-    isOpen.value = false
+  const target = event.target as Element;
+  if (!target.closest(".relative")) {
+    isOpen.value = false;
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('click', closeOnClickOutside)
-})
+  document.addEventListener("click", closeOnClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeOnClickOutside)
-})
+  document.removeEventListener("click", closeOnClickOutside);
+});
 </script>

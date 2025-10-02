@@ -23,13 +23,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Menu } from 'lucide-vue-next'
-import Sidebar from '@/components/Sidebar.vue'
+import { ref } from "vue";
+import { Menu } from "lucide-vue-next";
+import Sidebar from "@/components/Sidebar.vue";
 
-const sidebarRef = ref<InstanceType<typeof Sidebar>>()
+const sidebarRef = ref<InstanceType<typeof Sidebar>>();
 
 const toggleSidebar = () => {
-  sidebarRef.value?.toggleSidebar()
-}
+  sidebarRef.value?.toggleSidebar();
+};
 </script>

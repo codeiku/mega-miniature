@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "serena_mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena-mcp-server",
+        "--context",
+        "ide-assistant"
+      ]
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "ctx7sk-a3f8ede5-53f8-4817-92e0-113951805d44"
+      ]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"]
+    }
+  }
+}
