@@ -408,14 +408,15 @@ const createDataset = ref({
 
 // Mock data options
 const datasetOptions: SelectOption[] = [
-  { value: "hr-cases", label: "HR Cases (HR_Cases_2024)" },
-  { value: "it-cases", label: "IT Cases (IT_Support_Tickets)" },
+  { value: "loan-applications", label: "Loan Applications (Loan_Apps_2024)" },
   {
-    value: "customer-service-cases",
-    label: "Customer Service Cases (CS_Cases_2024)",
+    value: "credit-applications",
+    label: "Credit Applications (Credit_Apps_2024)",
   },
-  { value: "leave-requests", label: "Leave Requests (HR_Leave_Requests)" },
-  { value: "support-tickets", label: "Support Tickets (General_Support)" },
+  {
+    value: "mortgage-applications",
+    label: "Mortgage Applications (Mortgage_Apps_2024)",
+  },
 ];
 
 const connectionOptions: SelectOption[] = [
@@ -430,11 +431,11 @@ const columnOptions: SelectOption[] = [
   { value: "case-id", label: "Case ID" },
   { value: "activity", label: "Activity" },
   { value: "timestamp", label: "Timestamp" },
-  { value: "end-timestamp", label: "End Timestamp" },
+  { value: "resource", label: "Resource" },
+  { value: "amount-requested", label: "Amount Requested" },
   { value: "customer-id", label: "Customer ID" },
-  { value: "product-name", label: "Product Name" },
-  { value: "event-type", label: "Event Type" },
-  { value: "duration", label: "Duration" },
+  { value: "application-type", label: "Application Type" },
+  { value: "channel", label: "Channel" },
 ];
 
 const createMethodOptions: RadioOption[] = [

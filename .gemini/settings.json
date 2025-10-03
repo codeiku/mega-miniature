@@ -17,7 +17,7 @@
         "-y",
         "@upstash/context7-mcp",
         "--api-key",
-        "ctx7sk-a3f8ede5-53f8-4817-92e0-113951805d44"
+        "ctx7sk-ca4ce60c-db39-4f20-8ce2-1c4a0b604b46"
       ]
     },
     "chrome-devtools": {

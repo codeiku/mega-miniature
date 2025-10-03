@@ -110,10 +110,9 @@ const isOpen = ref(false);
 
 const primaryNavItems = [
   { name: "Data", href: "/data", icon: Database },
-  { name: "Process", href: "/process", icon: Cog },
+  { name: "Process Explorer", href: "/process", icon: Cog },
   { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
-  { name: "Conformance", href: "/conformance", icon: Activity },
-  { name: "Explore", href: "/explore", icon: Search },
+  { name: "Cases Explorer", href: "/explore", icon: Search },
 ];
 
 const secondaryNavItems = [

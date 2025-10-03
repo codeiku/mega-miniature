@@ -7,80 +7,50 @@
         <div>
           <h2 class="text-lg font-semibold text-gray-900">Data Selection</h2>
           <p class="mt-1 text-sm text-gray-600">
-            Select multiple datasets for analysis and data exploration.
+            Select a project, dataset, and timestamp columns for analysis.
           </p>
         </div>
 
         <!-- Form Elements -->
         <div class="space-y-4">
-          <!-- Project Multi-Select -->
+          <!-- Project Select -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Projects
+              Project
             </label>
-            <MultiSelect
-              v-model="selectedProjects"
+            <Select
+              v-model="selectedProject"
               :options="projectOptions"
-              placeholder="Select projects..."
+              placeholder="Select project..."
             />
           </div>
 
-          <!-- Dataset Multi-Select -->
+          <!-- Dataset Select -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Datasets
+              Dataset
             </label>
-            <MultiSelect
-              v-model="selectedDatasets"
+            <Select
+              v-model="selectedDataset"
               :options="availableDatasets"
-              placeholder="Select datasets..."
-              :disabled="selectedProjects.length === 0"
+              placeholder="Select dataset..."
+              :disabled="!selectedProject"
             />
-            <p
-              v-if="selectedProjects.length === 0"
-              class="text-xs text-gray-500 mt-1"
-            >
-              Please select at least one project first
+            <p v-if="!selectedProject" class="text-xs text-gray-500 mt-1">
+              Please select a project first
             </p>
           </div>
 
-          <!-- Timestamp Column Select -->
+          <!-- Timestamp Columns Select -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Timestamp Column
+              Timestamp Columns
             </label>
-            <Select
-              v-model="selectedTimestamp"
+            <MultiSelect
+              v-model="selectedTimestampColumns"
               :options="timestampOptions"
-              placeholder="Select timestamp column..."
+              placeholder="Select timestamp columns..."
             />
-          </div>
-
-          <!-- Toggle Switches -->
-          <div class="space-y-4 pt-2">
-            <div class="flex items-start space-x-3">
-              <Switch v-model="enableRealTime" class="mt-1" />
-              <div>
-                <label class="text-sm font-medium text-gray-700">
-                  Enable Real-time Processing
-                </label>
-                <p class="text-xs text-gray-500 mt-1">
-                  Process data updates automatically as they arrive
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-start space-x-3">
-              <Switch v-model="enableCaching" class="mt-1" />
-              <div>
-                <label class="text-sm font-medium text-gray-700">
-                  Enable Data Caching
-                </label>
-                <p class="text-xs text-gray-500 mt-1">
-                  Cache processed results to improve performance
-                </p>
-              </div>
-            </div>
           </div>
 
           <!-- Action Button -->
@@ -115,7 +85,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import Select, { type SelectOption } from "@/components/ui/Select.vue";
-import Switch from "@/components/ui/Switch.vue";
 import Button from "@/components/ui/Button.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import DataTabs, { type DataTab } from "@/components/ui/DataTabs.vue";
@@ -125,83 +94,37 @@ import MultiSelect, {
 } from "@/components/ui/MultiSelect.vue";
 
 // Form state
-const selectedProjects = ref<string[]>([]);
-const selectedDatasets = ref<string[]>([]);
-const selectedTimestamp = ref("");
-const enableRealTime = ref(false);
-const enableCaching = ref(true);
+const selectedProject = ref("");
+const selectedDataset = ref("");
+const selectedTimestampColumns = ref<string[]>([]);
 const hasData = ref(false);
 const activeTab = ref("");
 
-// Mock data options
-const projectOptions: MultiSelectOption[] = [
-  { value: "hr-department", label: "HR Department" },
-  { value: "it-department", label: "IT Department" },
-  { value: "customer-service", label: "Customer Service" },
-  { value: "operations", label: "Operations" },
-  { value: "finance", label: "Finance" },
+// Mock data options - single project
+const projectOptions: SelectOption[] = [
+  { value: "financial-services", label: "Financial Services" },
 ];
 
-// Project-based dataset options
-const projectDatasets: Record<string, MultiSelectOption[]> = {
-  "hr-department": [
-    { value: "hr-cases", label: "HR Cases - Employee Relations" },
-    { value: "leave-requests", label: "Leave Requests" },
-    { value: "hr-onboarding", label: "Employee Onboarding" },
-    { value: "hr-performance", label: "Performance Reviews" },
-    { value: "hr-training", label: "Training Programs" },
-    { value: "hr-recruitment", label: "Recruitment Process" },
-  ],
-  "it-department": [
-    { value: "it-cases", label: "IT Support Tickets" },
-    { value: "it-incidents", label: "Incident Management" },
-    { value: "it-changes", label: "Change Requests" },
-    { value: "it-projects", label: "IT Projects" },
-    { value: "it-maintenance", label: "System Maintenance" },
-    { value: "it-security", label: "Security Incidents" },
-  ],
-  "customer-service": [
-    { value: "customer-service-cases", label: "Customer Service Cases" },
-    { value: "customer-complaints", label: "Customer Complaints" },
-    { value: "customer-returns", label: "Return Requests" },
-    { value: "customer-escalations", label: "Escalated Issues" },
-    { value: "customer-feedback", label: "Feedback Processing" },
-  ],
-  operations: [
-    { value: "support-tickets", label: "General Support Tickets" },
-    { value: "ops-procurement", label: "Procurement Requests" },
-    { value: "ops-logistics", label: "Logistics Operations" },
-    { value: "ops-quality", label: "Quality Assurance" },
-    { value: "ops-inventory", label: "Inventory Management" },
-  ],
-  finance: [
-    { value: "finance-invoices", label: "Invoice Processing" },
-    { value: "finance-expenses", label: "Expense Reports" },
-    { value: "finance-budgets", label: "Budget Approvals" },
-    { value: "finance-payments", label: "Payment Processing" },
-    { value: "finance-audits", label: "Audit Processes" },
+// Project-based dataset options - 3 datasets only
+const projectDatasets: Record<string, SelectOption[]> = {
+  "financial-services": [
+    { value: "loan-applications", label: "Loan Applications" },
+    { value: "credit-applications", label: "Credit Applications" },
+    { value: "mortgage-applications", label: "Mortgage Applications" },
   ],
 };
 
-const availableDatasets = computed((): MultiSelectOption[] => {
-  if (selectedProjects.value.length === 0) return [];
-
-  // Combine datasets from all selected projects
-  const allDatasets: MultiSelectOption[] = [];
-  selectedProjects.value.forEach((projectValue) => {
-    const datasets = projectDatasets[projectValue] || [];
-    allDatasets.push(...datasets);
-  });
-
-  return allDatasets;
+const availableDatasets = computed((): SelectOption[] => {
+  if (!selectedProject.value) return [];
+  return projectDatasets[selectedProject.value] || [];
 });
 
-const timestampOptions: SelectOption[] = [
-  { value: "case_created", label: "case_created" },
-  { value: "case_updated", label: "case_updated" },
-  { value: "event_timestamp", label: "event_timestamp" },
-  { value: "submission_date", label: "submission_date" },
-  { value: "completion_date", label: "completion_date" },
+const timestampOptions: MultiSelectOption[] = [
+  { value: "timestamp", label: "timestamp" },
+  { value: "start_timestamp", label: "start_timestamp" },
+  { value: "end_timestamp", label: "end_timestamp" },
+  { value: "created_at", label: "created_at" },
+  { value: "completed_at", label: "completed_at" },
 ];
 
 // Table columns
@@ -209,287 +132,504 @@ const tableColumns: TableColumn[] = [
   { key: "case_id", label: "Case ID", type: "text" },
   { key: "activity", label: "Activity", type: "text" },
   { key: "timestamp", label: "Timestamp", type: "text" },
-  { key: "status", label: "Status", type: "badge" },
-  { key: "duration", label: "Duration", type: "text" },
+  { key: "resource", label: "Resource", type: "text" },
+  { key: "amount_requested", label: "Amount", type: "text" },
 ];
 
-// Example data for each dataset
+// Loan application demo data
 const datasetExamples: Record<string, any[]> = {
-  "hr-cases": [
+  "loan-applications": [
+    // Case 173691 - Complete flow
     {
-      case_id: "HR-001",
-      activity: "Submit Request",
+      case_id: "173691",
+      activity: "START",
       timestamp: "2024-01-15 09:30:00",
-      status: "Completed",
-      duration: "2m",
+      resource: "System",
+      amount_requested: 10000,
     },
     {
-      case_id: "HR-001",
-      activity: "Initial Review",
+      case_id: "173691",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-15 09:32:00",
+      resource: "User_1",
+      amount_requested: 10000,
+    },
+    {
+      case_id: "173691",
+      activity: "A_PREACCEPTED",
       timestamp: "2024-01-15 10:15:00",
-      status: "Completed",
-      duration: "45m",
+      resource: "System",
+      amount_requested: 10000,
     },
     {
-      case_id: "HR-001",
-      activity: "Manager Approval",
-      timestamp: "2024-01-16 14:20:00",
-      status: "Approved",
-      duration: "1d 4h",
-    },
-    {
-      case_id: "HR-002",
-      activity: "Submit Request",
-      timestamp: "2024-01-16 11:00:00",
-      status: "Completed",
-      duration: "3m",
-    },
-    {
-      case_id: "HR-002",
-      activity: "Initial Review",
-      timestamp: "2024-01-16 15:30:00",
-      status: "In Progress",
-      duration: "4h 30m",
-    },
-  ],
-  "leave-requests": [
-    {
-      case_id: "LR-001",
-      activity: "Submit Leave Request",
-      timestamp: "2024-01-15 09:00:00",
-      status: "Completed",
-      duration: "3m",
-    },
-    {
-      case_id: "LR-001",
-      activity: "Manager Review",
-      timestamp: "2024-01-15 16:30:00",
-      status: "Approved",
-      duration: "7h 30m",
-    },
-    {
-      case_id: "LR-001",
-      activity: "HR Approval",
-      timestamp: "2024-01-16 10:15:00",
-      status: "Approved",
-      duration: "17h 45m",
-    },
-    {
-      case_id: "LR-002",
-      activity: "Submit Leave Request",
-      timestamp: "2024-01-16 08:20:00",
-      status: "Completed",
-      duration: "2m",
-    },
-    {
-      case_id: "LR-002",
-      activity: "Manager Review",
-      timestamp: "2024-01-16 12:45:00",
-      status: "Pending",
-      duration: "4h 25m",
-    },
-  ],
-  "hr-onboarding": [
-    {
-      case_id: "ONB-001",
-      activity: "Application Received",
-      timestamp: "2024-01-15 08:00:00",
-      status: "Completed",
-      duration: "1m",
-    },
-    {
-      case_id: "ONB-001",
-      activity: "Background Check",
-      timestamp: "2024-01-15 09:00:00",
-      status: "Completed",
-      duration: "2d",
-    },
-    {
-      case_id: "ONB-001",
-      activity: "Equipment Setup",
-      timestamp: "2024-01-17 10:00:00",
-      status: "In Progress",
-      duration: "4h",
-    },
-  ],
-  "it-cases": [
-    {
-      case_id: "IT-001",
-      activity: "Create Ticket",
-      timestamp: "2024-01-15 08:45:00",
-      status: "Completed",
-      duration: "1m",
-    },
-    {
-      case_id: "IT-001",
-      activity: "Triage",
-      timestamp: "2024-01-15 09:00:00",
-      status: "Completed",
-      duration: "15m",
-    },
-    {
-      case_id: "IT-001",
-      activity: "Assign Tech",
-      timestamp: "2024-01-15 09:30:00",
-      status: "Completed",
-      duration: "30m",
-    },
-    {
-      case_id: "IT-002",
-      activity: "Create Ticket",
-      timestamp: "2024-01-15 14:20:00",
-      status: "Completed",
-      duration: "2m",
-    },
-    {
-      case_id: "IT-002",
-      activity: "Investigation",
-      timestamp: "2024-01-15 16:45:00",
-      status: "In Progress",
-      duration: "2h 25m",
-    },
-  ],
-  "it-incidents": [
-    {
-      case_id: "INC-001",
-      activity: "Incident Reported",
-      timestamp: "2024-01-15 12:00:00",
-      status: "Completed",
-      duration: "2m",
-    },
-    {
-      case_id: "INC-001",
-      activity: "Initial Assessment",
-      timestamp: "2024-01-15 12:15:00",
-      status: "Completed",
-      duration: "15m",
-    },
-    {
-      case_id: "INC-001",
-      activity: "Resolution",
+      case_id: "173691",
+      activity: "W_COMPLETE_APPLICATION",
       timestamp: "2024-01-15 14:30:00",
-      status: "Resolved",
-      duration: "2h 15m",
-    },
-  ],
-  "customer-service-cases": [
-    {
-      case_id: "CS-001",
-      activity: "Contact Received",
-      timestamp: "2024-01-15 10:15:00",
-      status: "Completed",
-      duration: "1m",
+      resource: "User_1",
+      amount_requested: 10000,
     },
     {
-      case_id: "CS-001",
-      activity: "Initial Response",
-      timestamp: "2024-01-15 10:20:00",
-      status: "Completed",
-      duration: "5m",
-    },
-    {
-      case_id: "CS-001",
-      activity: "Issue Analysis",
-      timestamp: "2024-01-15 11:30:00",
-      status: "Resolved",
-      duration: "1h 10m",
-    },
-    {
-      case_id: "CS-002",
-      activity: "Contact Received",
-      timestamp: "2024-01-15 13:45:00",
-      status: "Completed",
-      duration: "2m",
-    },
-    {
-      case_id: "CS-002",
-      activity: "Escalation",
-      timestamp: "2024-01-15 15:20:00",
-      status: "Escalated",
-      duration: "1h 35m",
-    },
-  ],
-  "customer-complaints": [
-    {
-      case_id: "CMP-001",
-      activity: "Complaint Received",
-      timestamp: "2024-01-15 11:00:00",
-      status: "Completed",
-      duration: "2m",
-    },
-    {
-      case_id: "CMP-001",
-      activity: "Investigation",
-      timestamp: "2024-01-15 14:00:00",
-      status: "In Progress",
-      duration: "3h",
-    },
-    {
-      case_id: "CMP-001",
-      activity: "Resolution",
+      case_id: "173691",
+      activity: "A_ACCEPTED",
       timestamp: "2024-01-16 09:00:00",
-      status: "Resolved",
-      duration: "19h",
+      resource: "User_5",
+      amount_requested: 10000,
+    },
+    {
+      case_id: "173691",
+      activity: "O_SELECTED",
+      timestamp: "2024-01-16 11:30:00",
+      resource: "User_1",
+      amount_requested: 10000,
+    },
+    {
+      case_id: "173691",
+      activity: "O_CREATED",
+      timestamp: "2024-01-16 12:00:00",
+      resource: "System",
+      amount_requested: 10000,
+    },
+    {
+      case_id: "173691",
+      activity: "O_SENT",
+      timestamp: "2024-01-16 12:05:00",
+      resource: "System",
+      amount_requested: 10000,
+    },
+    {
+      case_id: "173691",
+      activity: "A_FINALIZED",
+      timestamp: "2024-01-17 10:30:00",
+      resource: "User_3",
+      amount_requested: 10000,
+    },
+
+    // Case 173692 - Incomplete (stopped at A_ACCEPTED)
+    {
+      case_id: "173692",
+      activity: "START",
+      timestamp: "2024-01-15 11:00:00",
+      resource: "System",
+      amount_requested: 15000,
+    },
+    {
+      case_id: "173692",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-15 11:05:00",
+      resource: "User_2",
+      amount_requested: 15000,
+    },
+    {
+      case_id: "173692",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-15 11:45:00",
+      resource: "System",
+      amount_requested: 15000,
+    },
+    {
+      case_id: "173692",
+      activity: "W_COMPLETE_APPLICATION",
+      timestamp: "2024-01-16 08:30:00",
+      resource: "User_2",
+      amount_requested: 15000,
+    },
+    {
+      case_id: "173692",
+      activity: "A_ACCEPTED",
+      timestamp: "2024-01-16 15:20:00",
+      resource: "User_4",
+      amount_requested: 15000,
+    },
+
+    // Case 173693 - Complete flow (variant)
+    {
+      case_id: "173693",
+      activity: "START",
+      timestamp: "2024-01-15 14:20:00",
+      resource: "System",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-15 14:25:00",
+      resource: "User_3",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-15 15:10:00",
+      resource: "System",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "W_COMPLETE_APPLICATION",
+      timestamp: "2024-01-15 16:45:00",
+      resource: "User_3",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "A_ACCEPTED",
+      timestamp: "2024-01-16 08:30:00",
+      resource: "User_5",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "O_SELECTED",
+      timestamp: "2024-01-16 09:15:00",
+      resource: "User_3",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "O_CREATED",
+      timestamp: "2024-01-16 09:45:00",
+      resource: "System",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "O_SENT",
+      timestamp: "2024-01-16 09:50:00",
+      resource: "System",
+      amount_requested: 5000,
+    },
+    {
+      case_id: "173693",
+      activity: "A_FINALIZED",
+      timestamp: "2024-01-16 14:20:00",
+      resource: "User_3",
+      amount_requested: 5000,
+    },
+
+    // Case 173694 - Only submitted (early dropout)
+    {
+      case_id: "173694",
+      activity: "START",
+      timestamp: "2024-01-16 08:00:00",
+      resource: "System",
+      amount_requested: 25000,
+    },
+    {
+      case_id: "173694",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-16 08:10:00",
+      resource: "User_4",
+      amount_requested: 25000,
+    },
+
+    // Case 173695 - Stopped at W_COMPLETE_APPLICATION
+    {
+      case_id: "173695",
+      activity: "START",
+      timestamp: "2024-01-16 10:30:00",
+      resource: "System",
+      amount_requested: 7500,
+    },
+    {
+      case_id: "173695",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-16 10:35:00",
+      resource: "User_1",
+      amount_requested: 7500,
+    },
+    {
+      case_id: "173695",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-16 11:20:00",
+      resource: "System",
+      amount_requested: 7500,
+    },
+    {
+      case_id: "173695",
+      activity: "W_COMPLETE_APPLICATION",
+      timestamp: "2024-01-16 15:45:00",
+      resource: "User_1",
+      amount_requested: 7500,
     },
   ],
-  "support-tickets": [
+  "credit-applications": [
+    // Case 173701 - Complete credit application
     {
-      case_id: "ST-001",
-      activity: "Ticket Created",
-      timestamp: "2024-01-15 11:30:00",
-      status: "Completed",
-      duration: "1m",
+      case_id: "173701",
+      activity: "START",
+      timestamp: "2024-01-17 09:00:00",
+      resource: "System",
+      amount_requested: 2000,
     },
     {
-      case_id: "ST-001",
-      activity: "Initial Assessment",
-      timestamp: "2024-01-15 12:00:00",
-      status: "Completed",
-      duration: "30m",
+      case_id: "173701",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-17 09:05:00",
+      resource: "User_2",
+      amount_requested: 2000,
     },
     {
-      case_id: "ST-001",
-      activity: "Assignment",
-      timestamp: "2024-01-15 14:15:00",
-      status: "Completed",
-      duration: "2h 15m",
+      case_id: "173701",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-17 09:30:00",
+      resource: "System",
+      amount_requested: 2000,
     },
     {
-      case_id: "ST-002",
-      activity: "Ticket Created",
-      timestamp: "2024-01-15 15:45:00",
-      status: "Completed",
-      duration: "2m",
+      case_id: "173701",
+      activity: "W_COMPLETE_APPLICATION",
+      timestamp: "2024-01-17 11:15:00",
+      resource: "User_2",
+      amount_requested: 2000,
     },
     {
-      case_id: "ST-002",
-      activity: "Investigation",
-      timestamp: "2024-01-16 09:30:00",
-      status: "In Progress",
-      duration: "17h 45m",
+      case_id: "173701",
+      activity: "A_ACCEPTED",
+      timestamp: "2024-01-17 14:30:00",
+      resource: "User_6",
+      amount_requested: 2000,
+    },
+    {
+      case_id: "173701",
+      activity: "O_SELECTED",
+      timestamp: "2024-01-17 15:00:00",
+      resource: "User_2",
+      amount_requested: 2000,
+    },
+    {
+      case_id: "173701",
+      activity: "O_CREATED",
+      timestamp: "2024-01-17 15:15:00",
+      resource: "System",
+      amount_requested: 2000,
+    },
+    {
+      case_id: "173701",
+      activity: "O_SENT",
+      timestamp: "2024-01-17 15:20:00",
+      resource: "System",
+      amount_requested: 2000,
+    },
+    {
+      case_id: "173701",
+      activity: "A_FINALIZED",
+      timestamp: "2024-01-18 09:45:00",
+      resource: "User_6",
+      amount_requested: 2000,
+    },
+
+    // Case 173702 - Incomplete credit application
+    {
+      case_id: "173702",
+      activity: "START",
+      timestamp: "2024-01-17 13:30:00",
+      resource: "System",
+      amount_requested: 3500,
+    },
+    {
+      case_id: "173702",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-17 13:40:00",
+      resource: "User_5",
+      amount_requested: 3500,
+    },
+    {
+      case_id: "173702",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-17 14:15:00",
+      resource: "System",
+      amount_requested: 3500,
+    },
+
+    // Case 173703 - Credit application stopped at acceptance
+    {
+      case_id: "173703",
+      activity: "START",
+      timestamp: "2024-01-18 08:45:00",
+      resource: "System",
+      amount_requested: 1500,
+    },
+    {
+      case_id: "173703",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-18 08:50:00",
+      resource: "User_3",
+      amount_requested: 1500,
+    },
+    {
+      case_id: "173703",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-18 09:25:00",
+      resource: "System",
+      amount_requested: 1500,
+    },
+    {
+      case_id: "173703",
+      activity: "W_COMPLETE_APPLICATION",
+      timestamp: "2024-01-18 12:00:00",
+      resource: "User_3",
+      amount_requested: 1500,
+    },
+    {
+      case_id: "173703",
+      activity: "A_ACCEPTED",
+      timestamp: "2024-01-18 16:30:00",
+      resource: "User_4",
+      amount_requested: 1500,
     },
   ],
-  "finance-invoices": [
+  "mortgage-applications": [
+    // Case 173801 - Large mortgage complete
     {
-      case_id: "INV-001",
-      activity: "Invoice Received",
-      timestamp: "2024-01-15 08:30:00",
-      status: "Completed",
-      duration: "1m",
+      case_id: "173801",
+      activity: "START",
+      timestamp: "2024-01-18 10:00:00",
+      resource: "System",
+      amount_requested: 250000,
     },
     {
-      case_id: "INV-001",
-      activity: "Validation",
-      timestamp: "2024-01-15 10:00:00",
-      status: "Completed",
-      duration: "1h 30m",
+      case_id: "173801",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-18 10:30:00",
+      resource: "User_1",
+      amount_requested: 250000,
     },
     {
-      case_id: "INV-001",
-      activity: "Approval",
-      timestamp: "2024-01-15 16:00:00",
-      status: "Approved",
-      duration: "6h",
+      case_id: "173801",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-18 14:00:00",
+      resource: "System",
+      amount_requested: 250000,
+    },
+    {
+      case_id: "173801",
+      activity: "W_COMPLETE_APPLICATION",
+      timestamp: "2024-01-19 09:30:00",
+      resource: "User_1",
+      amount_requested: 250000,
+    },
+    {
+      case_id: "173801",
+      activity: "A_ACCEPTED",
+      timestamp: "2024-01-22 11:00:00",
+      resource: "User_7",
+      amount_requested: 250000,
+    },
+    {
+      case_id: "173801",
+      activity: "O_SELECTED",
+      timestamp: "2024-01-22 14:30:00",
+      resource: "User_1",
+      amount_requested: 250000,
+    },
+    {
+      case_id: "173801",
+      activity: "O_CREATED",
+      timestamp: "2024-01-22 15:45:00",
+      resource: "System",
+      amount_requested: 250000,
+    },
+    {
+      case_id: "173801",
+      activity: "O_SENT",
+      timestamp: "2024-01-22 16:00:00",
+      resource: "System",
+      amount_requested: 250000,
+    },
+    {
+      case_id: "173801",
+      activity: "A_FINALIZED",
+      timestamp: "2024-01-25 13:20:00",
+      resource: "User_7",
+      amount_requested: 250000,
+    },
+
+    // Case 173802 - Mortgage stopped at preaccepted
+    {
+      case_id: "173802",
+      activity: "START",
+      timestamp: "2024-01-19 11:30:00",
+      resource: "System",
+      amount_requested: 180000,
+    },
+    {
+      case_id: "173802",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-19 12:15:00",
+      resource: "User_6",
+      amount_requested: 180000,
+    },
+    {
+      case_id: "173802",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-19 16:45:00",
+      resource: "System",
+      amount_requested: 180000,
+    },
+
+    // Case 173803 - Small mortgage complete (fast track)
+    {
+      case_id: "173803",
+      activity: "START",
+      timestamp: "2024-01-20 08:30:00",
+      resource: "System",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "A_SUBMITTED",
+      timestamp: "2024-01-20 08:45:00",
+      resource: "User_4",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "A_PREACCEPTED",
+      timestamp: "2024-01-20 09:15:00",
+      resource: "System",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "W_COMPLETE_APPLICATION",
+      timestamp: "2024-01-20 11:30:00",
+      resource: "User_4",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "A_ACCEPTED",
+      timestamp: "2024-01-20 15:00:00",
+      resource: "User_8",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "O_SELECTED",
+      timestamp: "2024-01-20 16:20:00",
+      resource: "User_4",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "O_CREATED",
+      timestamp: "2024-01-20 16:45:00",
+      resource: "System",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "O_SENT",
+      timestamp: "2024-01-20 17:00:00",
+      resource: "System",
+      amount_requested: 120000,
+    },
+    {
+      case_id: "173803",
+      activity: "A_FINALIZED",
+      timestamp: "2024-01-21 10:30:00",
+      resource: "User_8",
+      amount_requested: 120000,
     },
   ],
 };
@@ -497,48 +637,56 @@ const datasetExamples: Record<string, any[]> = {
 // Computed properties
 const canProcess = computed(() => {
   return (
-    selectedProjects.value.length > 0 &&
-    selectedDatasets.value.length > 0 &&
-    selectedTimestamp.value
+    selectedProject.value &&
+    selectedDataset.value &&
+    selectedTimestampColumns.value.length > 0
   );
 });
 
 const datasetTabs = computed((): DataTab[] => {
-  if (!hasData.value || selectedDatasets.value.length === 0) return [];
+  if (!hasData.value || !selectedDataset.value) return [];
 
-  return selectedDatasets.value.map((datasetValue) => {
-    const dataset = availableDatasets.value.find(
-      (d) => d.value === datasetValue,
-    );
-    return {
-      value: datasetValue,
-      label: dataset?.label || datasetValue,
-      count: datasetExamples[datasetValue]?.length || 0,
-    };
-  });
+  const dataset = availableDatasets.value.find(
+    (d) => d.value === selectedDataset.value,
+  );
+  return [
+    {
+      value: selectedDataset.value,
+      label: dataset?.label || selectedDataset.value,
+      count: datasetExamples[selectedDataset.value]?.length || 0,
+    },
+  ];
 });
 
-// Watch for project changes to clear selected datasets
-watch(selectedProjects, () => {
-  selectedDatasets.value = [];
+// Watch for project changes to clear selected dataset
+watch(selectedProject, () => {
+  selectedDataset.value = "";
   hasData.value = false;
+});
+
+// Watch for dataset changes to show data immediately
+watch(selectedDataset, (newDataset) => {
+  if (newDataset) {
+    hasData.value = true;
+    activeTab.value = newDataset;
+  } else {
+    hasData.value = false;
+    activeTab.value = "";
+  }
 });
 
 // Methods
 const loadData = () => {
   if (canProcess.value) {
     hasData.value = true;
-    // Set the first selected dataset as active tab
-    if (selectedDatasets.value.length > 0) {
-      activeTab.value = selectedDatasets.value[0];
+    if (selectedDataset.value) {
+      activeTab.value = selectedDataset.value;
     }
 
     console.log("Loading data with configuration:", {
-      projects: selectedProjects.value,
-      datasets: selectedDatasets.value,
-      timestamp: selectedTimestamp.value,
-      realTime: enableRealTime.value,
-      caching: enableCaching.value,
+      project: selectedProject.value,
+      dataset: selectedDataset.value,
+      timestampColumns: selectedTimestampColumns.value,
     });
   }
 };

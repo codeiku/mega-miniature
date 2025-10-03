@@ -303,13 +303,13 @@ import "@vue-flow/core/dist/theme-default.css";
 import "@vue-flow/controls/dist/style.css";
 import "@vue-flow/minimap/dist/style.css";
 
-const selectedDataset = ref("hr-cases");
+const selectedDataset = ref("loan-applications");
 const graphDirection = ref("horizontal");
 
 const datasetOptions: SelectOption[] = [
-  { value: "hr-cases", label: "HR Cases" },
-  { value: "it-cases", label: "IT Cases" },
-  { value: "customer-service-cases", label: "Customer Service Cases" },
+  { value: "loan-applications", label: "Loan Applications" },
+  { value: "credit-applications", label: "Credit Applications" },
+  { value: "mortgage-applications", label: "Mortgage Applications" },
 ];
 
 const directionOptions: SelectOption[] = [
@@ -333,26 +333,26 @@ const timeRangeOptions: SelectOption[] = [
 
 const topVariants = computed(() => {
   const variants = {
-    "hr-cases": [
-      { id: 1, name: "Standard Flow", percentage: 65 },
+    "loan-applications": [
+      { id: 1, name: "Complete Flow", percentage: 60 },
+      { id: 2, name: "Approved but Incomplete", percentage: 25 },
+      { id: 3, name: "Early Dropout", percentage: 10 },
+      { id: 4, name: "Rejected", percentage: 5 },
+    ],
+    "credit-applications": [
+      { id: 1, name: "Standard Approval", percentage: 70 },
       { id: 2, name: "Fast Track", percentage: 20 },
-      { id: 3, name: "Complex Review", percentage: 12 },
-      { id: 4, name: "Escalated", percentage: 3 },
+      { id: 3, name: "Manual Review", percentage: 8 },
+      { id: 4, name: "Declined", percentage: 2 },
     ],
-    "it-cases": [
-      { id: 1, name: "Standard Resolution", percentage: 72 },
-      { id: 2, name: "Quick Fix", percentage: 18 },
-      { id: 3, name: "Escalated Tech", percentage: 7 },
-      { id: 4, name: "External Vendor", percentage: 3 },
-    ],
-    "customer-service-cases": [
-      { id: 1, name: "Direct Resolution", percentage: 58 },
-      { id: 2, name: "With Escalation", percentage: 22 },
-      { id: 3, name: "Complex Analysis", percentage: 15 },
-      { id: 4, name: "Multi-department", percentage: 5 },
+    "mortgage-applications": [
+      { id: 1, name: "Full Approval", percentage: 45 },
+      { id: 2, name: "Extended Review", percentage: 30 },
+      { id: 3, name: "Pre-approval Only", percentage: 15 },
+      { id: 4, name: "Withdrawn", percentage: 10 },
     ],
   };
-  return variants[selectedDataset.value] || variants["hr-cases"];
+  return variants[selectedDataset.value] || variants["loan-applications"];
 });
 
 // Helper functions for process mining UI
@@ -403,7 +403,7 @@ const calculateEdgeColor = (caseCount: number, maxCases: number) => {
 
 // Process flow data based on selected dataset
 const processFlows = {
-  "hr-cases": {
+  "loan-applications": {
     nodes: [
       {
         id: "1",
@@ -531,7 +531,7 @@ const processFlows = {
       activities: 6,
     },
   },
-  "it-cases": {
+  "credit-applications": {
     nodes: [
       {
         id: "1",
@@ -677,7 +677,7 @@ const processFlows = {
       activities: 7,
     },
   },
-  "customer-service-cases": {
+  "mortgage-applications": {
     nodes: [
       {
         id: "1",
