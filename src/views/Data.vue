@@ -13,18 +13,6 @@
 
         <!-- Form Elements -->
         <div class="space-y-4">
-          <!-- Project Select -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Project
-            </label>
-            <Select
-              v-model="selectedProject"
-              :options="projectOptions"
-              placeholder="Select project..."
-            />
-          </div>
-
           <!-- Dataset Select -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -32,13 +20,9 @@
             </label>
             <Select
               v-model="selectedDataset"
-              :options="availableDatasets"
+              :options="datasetOptions"
               placeholder="Select dataset..."
-              :disabled="!selectedProject"
             />
-            <p v-if="!selectedProject" class="text-xs text-gray-500 mt-1">
-              Please select a project first
-            </p>
           </div>
 
           <!-- Timestamp Columns Select -->
@@ -94,30 +78,17 @@ import MultiSelect, {
 } from "@/components/ui/MultiSelect.vue";
 
 // Form state
-const selectedProject = ref("");
 const selectedDataset = ref("");
 const selectedTimestampColumns = ref<string[]>([]);
 const hasData = ref(false);
 const activeTab = ref("");
 
-// Mock data options - single project
-const projectOptions: SelectOption[] = [
-  { value: "financial-services", label: "Financial Services" },
+// Dataset options
+const datasetOptions: SelectOption[] = [
+  { value: "loan-applications", label: "Loan Applications" },
+  { value: "credit-applications", label: "Credit Applications" },
+  { value: "mortgage-applications", label: "Mortgage Applications" },
 ];
-
-// Project-based dataset options - 3 datasets only
-const projectDatasets: Record<string, SelectOption[]> = {
-  "financial-services": [
-    { value: "loan-applications", label: "Loan Applications" },
-    { value: "credit-applications", label: "Credit Applications" },
-    { value: "mortgage-applications", label: "Mortgage Applications" },
-  ],
-};
-
-const availableDatasets = computed((): SelectOption[] => {
-  if (!selectedProject.value) return [];
-  return projectDatasets[selectedProject.value] || [];
-});
 
 const timestampOptions: MultiSelectOption[] = [
   { value: "timestamp", label: "timestamp" },
@@ -637,7 +608,6 @@ const datasetExamples: Record<string, any[]> = {
 // Computed properties
 const canProcess = computed(() => {
   return (
-    selectedProject.value &&
     selectedDataset.value &&
     selectedTimestampColumns.value.length > 0
   );
@@ -646,7 +616,7 @@ const canProcess = computed(() => {
 const datasetTabs = computed((): DataTab[] => {
   if (!hasData.value || !selectedDataset.value) return [];
 
-  const dataset = availableDatasets.value.find(
+  const dataset = datasetOptions.find(
     (d) => d.value === selectedDataset.value,
   );
   return [
@@ -656,12 +626,6 @@ const datasetTabs = computed((): DataTab[] => {
       count: datasetExamples[selectedDataset.value]?.length || 0,
     },
   ];
-});
-
-// Watch for project changes to clear selected dataset
-watch(selectedProject, () => {
-  selectedDataset.value = "";
-  hasData.value = false;
 });
 
 // Watch for dataset changes to show data immediately
@@ -684,7 +648,6 @@ const loadData = () => {
     }
 
     console.log("Loading data with configuration:", {
-      project: selectedProject.value,
       dataset: selectedDataset.value,
       timestampColumns: selectedTimestampColumns.value,
     });
