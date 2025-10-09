@@ -43,6 +43,16 @@ const router = createRouter({
       name: "admin",
       component: () => import("@/views/Admin.vue"),
     },
+    {
+      path: "/interactive",
+      name: "interactive",
+      component: () => import("@/views/Interactive.vue"),
+    },
+    {
+      path: "/dataset-admin",
+      name: "dataset-admin",
+      component: () => import("@/views/DatasetAdmin.vue"),
+    },
   ],
 });
 

@@ -102,6 +102,7 @@ import {
   Cog,
   Activity,
   Search,
+  MessageSquare,
 } from "lucide-vue-next";
 import { cn } from "@/lib/utils";
 
@@ -113,6 +114,7 @@ const primaryNavItems = [
   { name: "Process Explorer", href: "/process", icon: Cog },
   { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
   { name: "Cases Explorer", href: "/explore", icon: Search },
+  { name: "Interactive Stories", href: "/interactive", icon: MessageSquare },
 ];
 
 const secondaryNavItems = [
